@@ -10,16 +10,19 @@ from PIL import Image
 import numpy as np
 
 from torchvision.transforms.functional import to_pil_image, to_tensor
+import folder_paths
 
 class LoadCatVTONPipeline:
     display_name = "Load CatVTON Pipeline"
 
     @classmethod
     def INPUT_TYPES(cls):
+        catvton_path = os.path.join(folder_paths.models_dir, "CatVTON")
+        sd15_inpaint_path = os.path.join(catvton_path, "stable-diffusion-inpainting")
         return {
             "required": {
-                "sd15_inpaint_path": ("STRING", {"default": "runwayml/stable-diffusion-inpainting"}),
-                "catvton_path": ("STRING", {"default": "zhengchong/CatVTON"}),
+                "sd15_inpaint_path": ("STRING", {"default": sd15_inpaint_path}),
+                "catvton_path": ("STRING", {"default": catvton_path}),
                 "mixed_precision": (["fp32", "fp16", "bf16"],),
             }
         }
@@ -51,9 +54,10 @@ class LoadAutoMasker:
 
     @classmethod
     def INPUT_TYPES(cls):
+        catvton_path = os.path.join(folder_paths.models_dir, "CatVTON")
         return {
             "required": {
-                "catvton_path": ("STRING", {"default": "zhengchong/CatVTON"}),
+                "catvton_path": ("STRING", {"default": catvton_path}),
             }
         }
 
@@ -63,7 +67,7 @@ class LoadAutoMasker:
     CATEGORY = "CatVTON" 
         
     def load(self, catvton_path):
-        catvton_path = snapshot_download(repo_id=catvton_path)
+        #catvton_path = snapshot_download(repo_id=catvton_path)
         automasker = AM(
             densepose_ckpt=os.path.join(catvton_path, "DensePose"),
             schp_ckpt=os.path.join(catvton_path, "SCHP"),

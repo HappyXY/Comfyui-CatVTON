@@ -21,6 +21,8 @@ from ..utils import (
     resize_and_crop,
     resize_and_padding,
 )
+import folder_paths
+
 
 
 class CatVTONPipeline:
@@ -38,8 +40,10 @@ class CatVTONPipeline:
         self.weight_dtype = weight_dtype
 
         self.noise_scheduler = DDIMScheduler.from_pretrained(base_ckpt, subfolder="scheduler")
-        self.vae = AutoencoderKL.from_pretrained("stabilityai/sd-vae-ft-mse").to(device, dtype=weight_dtype)
+        #self.vae = AutoencoderKL.from_pretrained("stabilityai/sd-vae-ft-mse").to(device, dtype=weight_dtype)
+        self.vae = AutoencoderKL.from_pretrained(os.path.join(folder_paths.models_dir, "CatVTON", "sd-vae-ft-mse")).to(device, dtype=weight_dtype)
         self.unet = UNet2DConditionModel.from_pretrained(base_ckpt, subfolder="unet").to(device, dtype=weight_dtype)
+
         init_adapter(self.unet, cross_attn_cls=SkipAttnProcessor)  # Skip Cross-Attention
         self.attn_modules = get_trainable_module(self.unet, "attention")
         self.auto_attn_ckpt_load(attn_ckpt, attn_ckpt_version)
